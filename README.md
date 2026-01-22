@@ -82,6 +82,8 @@ Toggle pheromone cues in observation with `SwarmConfig.obs_include_pheromone`.
 - `env/config.py` : configuration dataclass
 - `train/random_rollout.py` : random policy sanity check
 - `train/independent_dqn_pytorch.py` : independent or shared DQN training
+- `train/demo.py` : load and render trained checkpoints
+- `docs/ARCHITECTURE.md` : detailed functionality and architecture
 
 ## Notes
 - Episode ends when all targets are collected or `max_steps` reached.
