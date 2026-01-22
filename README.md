@@ -4,10 +4,26 @@ A minimal multi-agent PyGame environment for swarm RL with pheromone stigmergy, 
 
 ## Screenshots
 
-![Default](docs/images/swarm_default.png)
-![No pheromone rendering](docs/images/swarm_no_pheromone.png)
-![Hovercraft dynamics](docs/images/swarm_hover.png)
-![Dense swarm](docs/images/swarm_dense.png)
+<p>
+  <img src="docs/images/swarm_default.png" width="480" />
+  <br />
+  <em>Default scene: tank dynamics with pheromone heatmap enabled.</em>
+</p>
+<p>
+  <img src="docs/images/swarm_no_pheromone.png" width="480" />
+  <br />
+  <em>No pheromone rendering: same environment without the heatmap overlay.</em>
+</p>
+<p>
+  <img src="docs/images/swarm_hover.png" width="480" />
+  <br />
+  <em>Hovercraft dynamics: agents drift slightly due to inertia/noise.</em>
+</p>
+<p>
+  <img src="docs/images/swarm_dense.png" width="480" />
+  <br />
+  <em>Dense swarm: more agents, targets, and obstacles.</em>
+</p>
 
 Generate the screenshots locally:
 
