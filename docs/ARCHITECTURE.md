@@ -222,3 +222,46 @@ If you want to evolve this toward a full research environment:
 - Add boundary conditions for pheromone diffusion
 - Add observation noise or domain randomization
 - Add environment wrappers for vectorized training
+
+## 16) How to Modify the Code
+
+This section gives practical guidance for common changes. Most tweaks are done in `env/config.py`.
+
+### Change world size, counts, or episode length
+- Edit `SwarmConfig` in `env/config.py`:
+  - `width`, `height`
+  - `n_agents`, `n_targets`, `n_obstacles`
+  - `max_steps`
+
+### Change rewards
+- Edit `reward_target`, `reward_step`, `reward_collision` in `env/config.py`.
+- If you need new reward terms, modify `SwarmEnv.step()` in `env/swarm_env.py`.
+
+### Change observations
+- Lidar: adjust `lidar_rays`, `lidar_max_range`, `lidar_step` in `env/config.py`.
+- Pheromone cue: toggle `obs_include_pheromone` or change `pheromone_samples`.
+- To add new channels, edit `_get_obs()` and update the concatenation order.
+
+### Change actions or dynamics
+- Actions are currently discrete (9 actions). The mapping lives in `_build_action_table()` in `env/swarm_env.py`.
+- Dynamics live in `TankKinematicsDriver` and `HovercraftDriver`.
+- To add a new driver, create a new class that implements `apply(...)` and update `_select_driver()`.
+
+### Change pheromone behavior
+- Deposit/decay/diffuse parameters live in `env/config.py`:
+  - `pheromone_deposit`, `pheromone_decay`, `pheromone_diffuse_rate`
+- The update logic lives in `_update_pheromone()` in `env/swarm_env.py`.
+
+### Add new targets or tasks
+- Targets are spawned in `_spawn_targets()` and collected in `_handle_targets()` in `env/swarm_env.py`.
+- For nest-return tasks, add a nest region and update rewards/termination logic in `step()`.
+
+### Training changes
+- DQN architecture: edit `QNetwork` in `train/independent_dqn_pytorch.py`.
+- Exploration schedule: edit `linear_schedule()` and DQN config values.
+- To train shared policy, pass `--shared-policy` to the training script.
+
+### Keep configs and code in sync
+- If you add new observation channels or actions, update:
+  - `obs_dim` assumptions in training scripts
+  - README documentation for actions/observations

@@ -97,6 +97,7 @@ Toggle pheromone cues in observation with `SwarmConfig.obs_include_pheromone`.
 - `train/independent_dqn_pytorch.py` : independent or shared DQN training
 - `train/demo.py` : load and render trained checkpoints
 - `docs/ARCHITECTURE.md` : detailed functionality and architecture
+- `docs/PROJECT_LOG.md` : decisions, notes, and next steps to resume later
 
 ## Notes
 - Episode ends when all targets are collected or `max_steps` reached.
