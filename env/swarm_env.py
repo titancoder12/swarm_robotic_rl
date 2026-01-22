@@ -186,6 +186,12 @@ class SwarmEnv:
         pygame.display.flip()
         self._clock.tick(fps)
 
+    def save_screenshot(self, path: str):
+        if self.headless:
+            raise RuntimeError("Cannot save screenshot in headless mode.")
+        self._ensure_pygame()
+        pygame.image.save(self._screen, path)
+
     def close(self):
         if self._pygame_inited:
             pygame.quit()
