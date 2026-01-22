@@ -9,6 +9,12 @@ A minimal multi-agent PyGame environment for swarm RL with pheromone stigmergy, 
 ![Hovercraft dynamics](docs/images/swarm_hover.png)
 ![Dense swarm](docs/images/swarm_dense.png)
 
+Generate the screenshots locally:
+
+```bash
+python train/capture_screenshots.py
+```
+
 ## Install
 
 ```bash
