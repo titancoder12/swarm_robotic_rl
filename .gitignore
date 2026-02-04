@@ -35,3 +35,6 @@ checkpoints/
 # OS
 .DS_Store
 Thumbs.db
+
+# Workspace
+swarm_sim.code-workspace
