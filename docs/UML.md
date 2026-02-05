@@ -6,23 +6,23 @@ This document provides Mermaid UML diagrams to explain how the system works at a
 
 ```mermaid
 flowchart TD
-  "train/demo.py::main()" --> "pygame.event.get()"
-  "train/demo.py::main()" --> "QNetwork.forward()"
-  "QNetwork.forward()" --> "train/independent_dqn_pytorch.py::QNetwork"
+  Demo["train/demo.py::main()"] --> PygameEvents["pygame.event.get()"]
+  Demo --> QForward["QNetwork.forward()"]
+  QForward --> QClass["train/independent_dqn_pytorch.py::QNetwork"]
 
-  "train/demo.py::main()" --> "env/swarm_env.py::SwarmEnv.step()"
-  "env/swarm_env.py::SwarmEnv.step()" --> "env/swarm_env.py::DynamicsDriver.apply()"
-  "env/swarm_env.py::DynamicsDriver.apply()" --> "env/swarm_env.py::TankKinematicsDriver.apply()"
-  "env/swarm_env.py::DynamicsDriver.apply()" --> "env/swarm_env.py::HovercraftDriver.apply()"
-  "env/swarm_env.py::SwarmEnv.step()" --> "env/swarm_env.py::_handle_collisions()"
-  "env/swarm_env.py::SwarmEnv.step()" --> "env/swarm_env.py::_handle_targets()"
-  "env/swarm_env.py::SwarmEnv.step()" --> "env/swarm_env.py::_update_pheromone()"
-  "env/swarm_env.py::SwarmEnv.step()" --> "env/swarm_env.py::_get_obs()"
+  Demo --> Step["env/swarm_env.py::SwarmEnv.step()"]
+  Step --> Apply["env/swarm_env.py::DynamicsDriver.apply()"]
+  Apply --> Tank["env/swarm_env.py::TankKinematicsDriver.apply()"]
+  Apply --> Hover["env/swarm_env.py::HovercraftDriver.apply()"]
+  Step --> Collide["env/swarm_env.py::_handle_collisions()"]
+  Step --> Targets["env/swarm_env.py::_handle_targets()"]
+  Step --> Phero["env/swarm_env.py::_update_pheromone()"]
+  Step --> Obs["env/swarm_env.py::_get_obs()"]
 
-  "train/demo.py::main()" --> "env/swarm_env.py::SwarmEnv.render()"
-  "env/swarm_env.py::SwarmEnv.render()" --> "env/swarm_env.py::_ensure_pygame()"
-  "env/swarm_env.py::SwarmEnv.render()" --> "pygame.display.flip()"
-  "env/swarm_env.py::SwarmEnv.render()" --> "pygame.time.Clock.tick()"
+  Demo --> Render["env/swarm_env.py::SwarmEnv.render()"]
+  Render --> Ensure["env/swarm_env.py::_ensure_pygame()"]
+  Render --> Flip["pygame.display.flip()"]
+  Render --> Tick["pygame.time.Clock.tick()"]
 ```
 
 ## Sequence Diagram (One Frame)
