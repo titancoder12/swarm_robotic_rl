@@ -95,3 +95,41 @@ flowchart LR
   E --> F["Observations"]
   F --> G["Rewards + Done flags"]
 ```
+
+## Training Flow (Independent DQN)
+
+```mermaid
+flowchart TD
+  Start["train/independent_dqn_pytorch.py::main()"] --> InitEnv["Initialize SwarmEnv (headless)"]
+  InitEnv --> InitNets["Init QNetwork(s) + target network(s)"]
+  InitNets --> InitBuf["Init replay buffer(s)"]
+  InitBuf --> Loop["Training loop (total steps)"]
+
+  Loop --> Act["Epsilon-greedy action selection"]
+  Act --> Step["env.step(actions)"]
+  Step --> Store["Store transition in replay buffer"]
+  Store --> TrainCheck["If enough data: sample batch"]
+  TrainCheck --> Update["Compute TD loss + optimizer step"]
+  Update --> TargetUpdate["Periodic target network update"]
+  TargetUpdate --> Save["Optional checkpoint save"]
+  Save --> DoneCheck["If episode done: env.reset()"]
+  DoneCheck --> Loop
+```
+
+## Training Sequence (Single Step)
+
+```mermaid
+sequenceDiagram
+  participant Trainer as train/independent_dqn_pytorch.py::main()
+  participant Env as env/swarm_env.py::SwarmEnv
+  participant Policy as QNetwork.forward()
+  participant Buffer as ReplayBuffer
+
+  Trainer->>Policy: obs -> Q-values
+  Policy-->>Trainer: Q-values
+  Trainer->>Env: step(actions)
+  Env-->>Trainer: next_obs, rewards, done
+  Trainer->>Buffer: add(transition)
+  Trainer->>Buffer: sample(batch)
+  Trainer->>Policy: compute loss + backprop
+```
