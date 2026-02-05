@@ -70,8 +70,11 @@ def main():
         actions = np.zeros(cfg.n_agents, dtype=np.int64)
         for i in range(cfg.n_agents):
             with torch.no_grad():
+                # Convert the i-th agent observation to a batch-1 tensor.
                 obs_tensor = torch.tensor(obs[i], dtype=torch.float32, device=device).unsqueeze(0)
+                # Forward pass to get Q-values for all actions.
                 q_vals = nets[i](obs_tensor)
+                # Greedy action selection: choose highest-Q action.
                 actions[i] = int(torch.argmax(q_vals, dim=1).item())
 
         # Step the environment (updates state + returns new observations).
