@@ -1,3 +1,8 @@
+"""
+Classic DQN / Q-learning setup (with replay buffer + target network) 
+and an ε-greedy behavior policy.
+
+"""
 from __future__ import annotations
 
 import argparse
@@ -157,6 +162,7 @@ def train(args):
                     q_vals = q_nets[i](obs_tensor)
                     actions[i] = int(torch.argmax(q_vals, dim=1).item())
 
+        # Agent sees observation, picks action, gets reward, environment changes.
         # Step the environment once and record transition data.
         next_obs, rewards, terminated, truncated, info = env.step(actions)
         done_flag = float(terminated or truncated)
