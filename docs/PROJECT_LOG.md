@@ -4,6 +4,7 @@ Use this file to capture decisions, open questions, and next steps so we can res
 
 ## Summary
 - Multi-agent PyGame swarm environment with stigmergy.
+- PettingZoo Parallel API for dict-based multi-agent interactions.
 - Discrete 9-action joystick interface.
 - DQN training with independent or shared policies.
 - Demo and screenshot tooling included.

@@ -1,6 +1,6 @@
 # Swarm RL PyGame Environment (Stigmergy)
 
-A minimal multi-agent PyGame environment for swarm RL with pheromone stigmergy, plus random rollout and DQN training scripts.
+A minimal multi-agent PyGame environment for swarm RL with pheromone stigmergy, using the PettingZoo Parallel API, plus random rollout and DQN training scripts.
 
 ## Screenshots
 
@@ -36,13 +36,25 @@ python train/capture_screenshots.py
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install pygame numpy torch
+pip install -r requirements.txt
 ```
 
 ## Random rollout (rendered)
 
 ```bash
 python train/random_rollout.py
+```
+
+## Quickstart: Train → Demo
+
+1. Train headless and save checkpoints:
+```bash
+python train/independent_dqn_pytorch.py --headless --total-steps 10000 --save-dir checkpoints --save-every 2000
+```
+
+2. Render the trained policy:
+```bash
+python train/demo.py --checkpoint-dir checkpoints
 ```
 
 ## Train (headless)
@@ -75,20 +87,22 @@ Shared-policy demo:
 python train/demo.py --checkpoint-dir checkpoints --shared-policy
 ```
 
-## Environment API
+## Environment API (PettingZoo Parallel API)
 
-`SwarmEnv` methods:
-- `reset(seed=None) -> (obs, info)`
-- `step(actions) -> (obs, rewards, terminated, truncated, info)`
+`SwarmEnv` implements the PettingZoo Parallel API.
+
+Methods:
+- `reset(seed=None, options=None) -> (obs_dict, info_dict)`
+- `step(action_dict) -> (obs_dict, rewards_dict, terminations, truncations, infos)`
 - `render(mode="human", fps=60)`
 - `close()`
 
 ### Actions
 Discrete action space with 9 actions: `{throttle ∈ [-1,0,1]} × {turn ∈ [-1,0,1]}`.
-Provide `actions` as a numpy array of shape `(n_agents,)` or `(n_agents, 1)` with values in `[0, 8]`.
+Provide `actions` as a dict keyed by agent id (e.g., `agent_0`) with values in `[0, 8]`.
 
 ### Observations
-Each agent gets a local observation vector:
+Each agent gets a local observation vector; `reset`/`step` return a dict of `agent_id -> obs`:
 - 9 lidar rays (normalized)
 - 2D relative vector to nearest target (agent frame, normalized)
 - 2D relative vector to nearest agent (agent frame, normalized)

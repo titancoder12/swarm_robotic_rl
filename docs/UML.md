@@ -39,10 +39,10 @@ sequenceDiagram
   Demo->>PG: pygame.event.get()
   Demo->>Policy: obs[i]
   Policy-->>Demo: action
-  Demo->>Env: step(actions)
+  Demo->>Env: step(action_dict)
   Env->>Driver: apply(state, action)
   Driver-->>Env: proposed_state
-  Env-->>Demo: obs, rewards, done
+  Env-->>Demo: obs_dict, rewards_dict, terminations, truncations
   Demo->>Render: render()
   Render->>PG: draw + flip + tick
 ```
@@ -52,8 +52,8 @@ sequenceDiagram
 ```mermaid
 classDiagram
   class SwarmEnv {
-    +reset(seed)
-    +step(actions)
+    +reset(seed, options)
+    +step(action_dict)
     +render(mode, fps)
     +close()
     -_ensure_pygame()
@@ -77,7 +77,7 @@ classDiagram
   }
 
   SwarmEnv --> SwarmConfig : config
-  SwarmEnv o-- AgentState : agents
+  SwarmEnv o-- AgentState : agent_states
   SwarmEnv --> DynamicsDriver : driver
   DynamicsDriver <|-- TankKinematicsDriver
   DynamicsDriver <|-- HovercraftDriver
@@ -106,7 +106,7 @@ flowchart TD
   InitBuf --> Loop["Training loop (total steps)"]
 
   Loop --> Act["Epsilon-greedy action selection"]
-  Act --> Step["env.step(actions)"]
+  Act --> Step["env.step(action_dict)"]
   Step --> Store["Store transition in replay buffer"]
   Store --> TrainCheck["If enough data: sample batch"]
   TrainCheck --> Update["Compute TD loss + optimizer step"]
@@ -127,8 +127,8 @@ sequenceDiagram
 
   Trainer->>Policy: obs -> Q-values
   Policy-->>Trainer: Q-values
-  Trainer->>Env: step(actions)
-  Env-->>Trainer: next_obs, rewards, done
+  Trainer->>Env: step(action_dict)
+  Env-->>Trainer: next_obs_dict, rewards_dict, terminations, truncations
   Trainer->>Buffer: add(transition)
   Trainer->>Buffer: sample(batch)
   Trainer->>Policy: compute loss + backprop

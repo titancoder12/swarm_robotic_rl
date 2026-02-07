@@ -6,7 +6,7 @@ This document explains the system design, module responsibilities, data flow, an
 
 The project implements a multi-agent swarm simulation with:
 - A PyGame-based 2D world
-- A multi-agent RL API (`reset/step/render/close`)
+- A PettingZoo Parallel API (`reset/step/render/close`)
 - Local, partial observations (lidar + local cues)
 - A pheromone (stigmergy) field updated by simple rules
 - Pluggable locomotion dynamics (tank or hovercraft)
@@ -29,22 +29,22 @@ Core idea: agents **do not communicate directly**. They interact only by sensing
 - `docs/ARCHITECTURE.md`
   - This document
 
-## 3) Environment API
+## 3) Environment API (PettingZoo Parallel)
 
 Class: `SwarmEnv`
 
 Methods:
-- `reset(seed=None) -> (obs, info)`
-- `step(actions) -> (obs, rewards, terminated, truncated, info)`
+- `reset(seed=None, options=None) -> (obs_dict, info_dict)`
+- `step(action_dict) -> (obs_dict, rewards_dict, terminations, truncations, infos)`
 - `render(mode="human", fps=60)`
 - `close()`
 
 Shapes and types:
-- `actions`: `np.ndarray` of shape `(n_agents,)` or `(n_agents, 1)` with discrete action IDs
-- `obs`: `np.ndarray` of shape `(n_agents, obs_dim)`
-- `rewards`: `np.ndarray` of shape `(n_agents,)`
-- `terminated`: bool (all targets collected)
-- `truncated`: bool (time limit)
+- `action_dict`: `dict[str, int]` keyed by agent id (e.g., `agent_0`)
+- `obs_dict`: `dict[str, np.ndarray]` each of shape `(obs_dim,)`
+- `rewards_dict`: `dict[str, float]`
+- `terminations`: `dict[str, bool]` (all targets collected)
+- `truncations`: `dict[str, bool]` (time limit)
 
 ## 4) World Model
 

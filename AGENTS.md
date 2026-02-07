@@ -8,7 +8,7 @@
 
 ## Build, Test, and Development Commands
 - `python -m venv .venv` and `source .venv/bin/activate`: create/activate a local virtual env.
-- `pip install pygame numpy torch`: install runtime dependencies.
+- `pip install -r requirements.txt`: install runtime dependencies.
 - `python train/random_rollout.py`: rendered random policy sanity check.
 - `python train/independent_dqn_pytorch.py --headless --total-steps 10000`: headless training run.
 - `python train/independent_dqn_pytorch.py --headless --save-every 2000 --save-dir checkpoints`: save checkpoints during training.
