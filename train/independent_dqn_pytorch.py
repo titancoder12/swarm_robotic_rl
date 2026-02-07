@@ -75,6 +75,17 @@ class ReplayBuffer:
         )
 
 
+def _dict_to_array(data, agent_ids, dtype=None):
+    arr = np.array([data[agent] for agent in agent_ids])
+    if dtype is not None:
+        arr = arr.astype(dtype)
+    return arr
+
+
+def _array_to_dict(arr, agent_ids):
+    return {agent: arr[i] for i, agent in enumerate(agent_ids)}
+
+
 class QNetwork(nn.Module):
     """Small MLP mapping observations to Q-values for each discrete action."""
     def __init__(self, obs_dim: int, action_dim: int):
@@ -108,7 +119,9 @@ def train(args):
     dqn_cfg = DQNConfig()
 
     env = SwarmEnv(cfg, headless=args.headless)
-    obs, _ = env.reset(seed=args.seed)
+    obs_dict, _ = env.reset(seed=args.seed)
+    agent_ids = env.possible_agents
+    obs = _dict_to_array(obs_dict, agent_ids, dtype=np.float32)
     obs_dim = obs.shape[1]
     action_dim = cfg.num_actions
 
@@ -164,7 +177,12 @@ def train(args):
 
         # Agent sees observation, picks action, gets reward, environment changes.
         # Step the environment once and record transition data.
-        next_obs, rewards, terminated, truncated, info = env.step(actions)
+        action_dict = _array_to_dict(actions, agent_ids)
+        next_obs_dict, rewards_dict, terminations, truncations, info = env.step(action_dict)
+        next_obs = _dict_to_array(next_obs_dict, agent_ids, dtype=np.float32)
+        rewards = _dict_to_array(rewards_dict, agent_ids, dtype=np.float32)
+        terminated = any(terminations.values())
+        truncated = any(truncations.values())
         done_flag = float(terminated or truncated)
 
         # Store transitions in each agent's replay buffer.
@@ -209,7 +227,8 @@ def train(args):
                 f"episode {episode} step {global_step} rewards {episode_rewards.mean():.2f} "
                 f"targets {info.get('targets_collected', 0)} epsilon {epsilon:.2f}"
             )
-            obs, _ = env.reset(seed=args.seed)
+            obs_dict, _ = env.reset(seed=args.seed)
+            obs = _dict_to_array(obs_dict, agent_ids, dtype=np.float32)
             episode_rewards = np.zeros(cfg.n_agents, dtype=np.float32)
 
         # 8) Optional checkpointing.

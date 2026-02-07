@@ -16,15 +16,21 @@ from env.swarm_env import SwarmEnv
 def main():
     cfg = SwarmConfig()
     env = SwarmEnv(cfg, headless=False)
-    obs, info = env.reset(seed=cfg.seed)
+    obs_dict, info = env.reset(seed=cfg.seed)
+    agent_ids = env.possible_agents
+    obs = np.stack([obs_dict[agent] for agent in agent_ids], axis=0)
 
     print("obs shape:", obs.shape, "info:", info)
     assert obs.shape == (cfg.n_agents, obs.shape[1])
 
     total_rewards = np.zeros(cfg.n_agents, dtype=np.float32)
     for step in range(300):
-        actions = np.random.randint(0, cfg.num_actions, size=(cfg.n_agents,))
-        next_obs, rewards, terminated, truncated, info = env.step(actions)
+        actions = {agent: int(np.random.randint(0, cfg.num_actions)) for agent in agent_ids}
+        next_obs_dict, rewards_dict, terminations, truncations, info = env.step(actions)
+        next_obs = np.stack([next_obs_dict[agent] for agent in agent_ids], axis=0)
+        rewards = np.array([rewards_dict[agent] for agent in agent_ids], dtype=np.float32)
+        terminated = any(terminations.values())
+        truncated = any(truncations.values())
 
         if np.isnan(rewards).any():
             raise ValueError("NaN rewards detected")

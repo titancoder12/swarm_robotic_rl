@@ -47,7 +47,9 @@ def main():
     # 2) Build config + environment, then reset to get initial observations.
     cfg = SwarmConfig(n_agents=args.n_agents)
     env = SwarmEnv(cfg, headless=False)
-    obs, _ = env.reset(seed=args.seed)
+    obs_dict, _ = env.reset(seed=args.seed)
+    agent_ids = env.possible_agents
+    obs = np.stack([obs_dict[agent] for agent in agent_ids], axis=0)
     env.render(fps=60) # render first frame
 
     # 3) Infer model dimensions and device.
@@ -78,12 +80,17 @@ def main():
                 actions[i] = int(torch.argmax(q_vals, dim=1).item())
 
         # Step the environment (updates state + returns new observations).
-        obs, _, terminated, truncated, _ = env.step(actions)
+        action_dict = {agent: int(actions[i]) for i, agent in enumerate(agent_ids)}
+        obs_dict, _, terminations, truncations, _ = env.step(action_dict)
+        obs = np.stack([obs_dict[agent] for agent in agent_ids], axis=0)
+        terminated = any(terminations.values())
+        truncated = any(truncations.values())
         # Render the updated state.
         env.render(fps=60)
         # Reset episode if finished.
         if terminated or truncated:
-            obs, _ = env.reset(seed=args.seed)
+            obs_dict, _ = env.reset(seed=args.seed)
+            obs = np.stack([obs_dict[agent] for agent in agent_ids], axis=0)
 
     # 6) Clean up PyGame resources on exit.
     env.close()

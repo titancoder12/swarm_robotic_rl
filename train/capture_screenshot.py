@@ -20,15 +20,18 @@ def main():
 
     cfg = SwarmConfig()
     env = SwarmEnv(cfg, headless=False)
-    obs, _ = env.reset(seed=0)
+    obs_dict, _ = env.reset(seed=0)
+    agent_ids = env.possible_agents
 
     # Step a few times to get a non-trivial scene.
     for _ in range(10):
-        actions = np.random.randint(0, cfg.num_actions, size=(cfg.n_agents,))
-        obs, _, terminated, truncated, _ = env.step(actions)
+        actions = {agent: int(np.random.randint(0, cfg.num_actions)) for agent in agent_ids}
+        obs_dict, _, terminations, truncations, _ = env.step(actions)
+        terminated = any(terminations.values())
+        truncated = any(truncations.values())
         env.render(fps=60)
         if terminated or truncated:
-            obs, _ = env.reset(seed=0)
+            obs_dict, _ = env.reset(seed=0)
 
     env.save_screenshot(out_path)
     env.close()

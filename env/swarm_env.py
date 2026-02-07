@@ -3,10 +3,12 @@ from __future__ import annotations
 import math
 import random
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 import pygame
+from gymnasium import spaces
+from pettingzoo import ParallelEnv
 
 from env.config import SwarmConfig
 
@@ -76,8 +78,10 @@ class HovercraftDriver(DynamicsDriver):
         return AgentState(nx, ny, theta, v=v, omega=omega, v_lat=v_lat)
 
 
-class SwarmEnv:
+class SwarmEnv(ParallelEnv):
     """Multi-agent 2D swarm environment with optional stigmergy and PyGame rendering."""
+    metadata = {"name": "swarm_env_v0", "render_modes": ["human"], "is_parallel": True}
+
     def __init__(self, cfg: SwarmConfig, headless: bool = False):
         """Create an environment instance with a given config."""
         self.cfg = cfg
@@ -91,7 +95,9 @@ class SwarmEnv:
         self.driver_mode = cfg.dynamics_mode
         self.driver = self._select_driver(cfg.dynamics_mode)
 
-        self.agents: List[AgentState] = []
+        self.possible_agents = [f"agent_{i}" for i in range(self.cfg.n_agents)]
+        self.agents = self.possible_agents[:]
+        self.agent_states: List[AgentState] = []
         self.targets: List[Tuple[float, float]] = []
         self.obstacles: List[pygame.Rect] = []
 
@@ -105,7 +111,36 @@ class SwarmEnv:
         self._screen = None
         self._clock = None
 
-    def reset(self, seed: int | None = None):
+        self._obs_dim = self._compute_obs_dim()
+        self._observation_spaces = {
+            agent: spaces.Box(low=-1.0, high=1.0, shape=(self._obs_dim,), dtype=np.float32)
+            for agent in self.possible_agents
+        }
+        self._action_spaces = {
+            agent: spaces.Discrete(self.cfg.num_actions)
+            for agent in self.possible_agents
+        }
+
+    def observation_space(self, agent: str):
+        """Return the observation space for a given agent."""
+        return self._observation_spaces[agent]
+
+    def action_space(self, agent: str):
+        """Return the action space for a given agent."""
+        return self._action_spaces[agent]
+
+    def _compute_obs_dim(self) -> int:
+        """Return the length of the per-agent observation vector."""
+        return (
+            self.cfg.lidar_rays
+            + 2  # target vector
+            + 2  # neighbor vector
+            + 2  # heading (sin, cos)
+            + 1  # speed
+            + self.cfg.pheromone_samples
+        )
+
+    def reset(self, seed: int | None = None, options: dict | None = None):
         """Reset the environment and return initial observations and info."""
         # (Re)initialize RNG and episode state, then spawn a fresh world.
         if seed is not None:
@@ -113,6 +148,7 @@ class SwarmEnv:
         self.step_count = 0
         self.terminated = False
         self.truncated = False
+        self.agents = self.possible_agents[:]
 
         # Randomize dynamics driver if mixed mode is enabled.
         if self.cfg.dynamics_mode == "mixed":
@@ -134,23 +170,29 @@ class SwarmEnv:
             self.pheromone_grid = None
 
         obs = self._get_obs()
+        obs_dict = {agent: obs[i] for i, agent in enumerate(self.possible_agents)}
         info = {"n_targets": len(self.targets)}
-        return obs, info
+        info_dict = {agent: info for agent in self.possible_agents}
+        return obs_dict, info_dict
 
-    def step(self, actions: np.ndarray):
+    def step(self, actions: Dict[str, int]):
         """Advance the simulation by one step using agent actions."""
+        if not self.agents:
+            raise RuntimeError("step() called with no active agents. Call reset() to start a new episode.")
+        if not isinstance(actions, dict):
+            raise ValueError("actions must be a dict keyed by agent id (Parallel API).")
+        for agent in self.agents:
+            if agent not in actions:
+                raise ValueError(f"Missing action for agent {agent}.")
+
         # One environment tick: apply actions, move agents, compute rewards/obs.
-        actions = np.asarray(actions)
-        if actions.ndim == 2 and actions.shape[1] == 1:
-            actions = actions.squeeze(1)
-        if actions.shape != (self.cfg.n_agents,):
-            raise ValueError(f"actions must have shape (n_agents,) or (n_agents,1). Got {actions.shape}")
+        actions = np.array([actions[agent] for agent in self.agents], dtype=np.int64)
 
         # Start with per-step reward for all agents.
         rewards = np.full((self.cfg.n_agents,), self.cfg.reward_step, dtype=np.float32)
         collisions = 0
 
-        for i, agent in enumerate(self.agents):
+        for i, agent in enumerate(self.agent_states):
             action_id = int(actions[i])
             throttle, turn = self.action_table[action_id]
             # Propose next state from dynamics, then check collisions.
@@ -161,7 +203,7 @@ class SwarmEnv:
                 rewards[i] += self.cfg.reward_collision
                 collisions += 1
             else:
-                self.agents[i] = proposed
+                self.agent_states[i] = proposed
 
         # Handle target collection and pheromone updates.
         collected = self._handle_targets(rewards)
@@ -177,8 +219,15 @@ class SwarmEnv:
             self.truncated = True
 
         obs = self._get_obs()
+        obs_dict = {agent: obs[i] for i, agent in enumerate(self.possible_agents)}
+        rewards_dict = {agent: float(rewards[i]) for i, agent in enumerate(self.possible_agents)}
+        terminations = {agent: self.terminated for agent in self.possible_agents}
+        truncations = {agent: self.truncated for agent in self.possible_agents}
         info = {"targets_collected": collected, "collisions": collisions}
-        return obs, rewards, self.terminated, self.truncated, info
+        infos = {agent: info for agent in self.possible_agents}
+        if self.terminated or self.truncated:
+            self.agents = []
+        return obs_dict, rewards_dict, terminations, truncations, infos
 
     def render(self, mode: str = "human", fps: int = 60):
         """Render the current state to a PyGame window."""
@@ -202,7 +251,7 @@ class SwarmEnv:
             pygame.draw.circle(self._screen, (80, 200, 80), (int(tx), int(ty)), int(self.cfg.target_radius))
 
         # Agents (body + heading line).
-        for agent in self.agents:
+        for agent in self.agent_states:
             x, y = int(agent.x), int(agent.y)
             pygame.draw.circle(self._screen, (200, 160, 50), (x, y), int(self.cfg.agent_radius))
             hx = x + int(math.cos(agent.theta) * self.cfg.agent_radius)
@@ -255,11 +304,11 @@ class SwarmEnv:
     def _spawn_agents(self):
         """Randomly place agents in non-colliding free space."""
         # Randomly place agents in free space.
-        self.agents = []
+        self.agent_states = []
         for _ in range(self.cfg.n_agents):
             pos = self._sample_free_position(self.cfg.agent_radius)
             theta = self.rng.uniform(-math.pi, math.pi)
-            self.agents.append(AgentState(pos[0], pos[1], theta))
+            self.agent_states.append(AgentState(pos[0], pos[1], theta))
 
     def _spawn_targets(self):
         """Randomly place targets in non-colliding free space."""
@@ -295,7 +344,7 @@ class SwarmEnv:
                 continue
             if any((ax - x) ** 2 + (ay - y) ** 2 < (radius * 2) ** 2 for ax, ay in self.targets):
                 continue
-            if any((agent.x - x) ** 2 + (agent.y - y) ** 2 < (radius * 2) ** 2 for agent in self.agents):
+            if any((agent.x - x) ** 2 + (agent.y - y) ** 2 < (radius * 2) ** 2 for agent in self.agent_states):
                 continue
             return x, y
         return radius, radius
@@ -322,7 +371,7 @@ class SwarmEnv:
         remaining = []
         for tx, ty in self.targets:
             collected_by = None
-            for i, agent in enumerate(self.agents):
+            for i, agent in enumerate(self.agent_states):
                 if (agent.x - tx) ** 2 + (agent.y - ty) ** 2 <= (self.cfg.target_radius + self.cfg.agent_radius) ** 2:
                     collected_by = i
                     break
@@ -339,7 +388,7 @@ class SwarmEnv:
         # Deposit pheromone where agents are, then decay/diffuse the grid.
         grid = self.pheromone_grid
         cell = self.cfg.pheromone_cell_size
-        for agent in self.agents:
+        for agent in self.agent_states:
             gx = int(agent.x // cell)
             gy = int(agent.y // cell)
             if 0 <= gy < grid.shape[0] and 0 <= gx < grid.shape[1]:
@@ -359,7 +408,7 @@ class SwarmEnv:
         """Assemble per-agent observations (lidar, targets, neighbors, etc.)."""
         # Build per-agent observation vectors.
         obs_list = []
-        for idx, agent in enumerate(self.agents):
+        for idx, agent in enumerate(self.agent_states):
             lidar = self._lidar_scan(agent)
             target_vec = self._nearest_target_vector(agent)
             neighbor_vec = self._nearest_agent_vector(agent, idx)
@@ -422,7 +471,7 @@ class SwarmEnv:
             return np.zeros(2, dtype=np.float32)
         best = None
         best_dist = float("inf")
-        for j, other in enumerate(self.agents):
+        for j, other in enumerate(self.agent_states):
             if j == idx:
                 continue
             dx = other.x - agent.x
@@ -493,7 +542,7 @@ if __name__ == "__main__":
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        actions = np.random.randint(0, cfg.num_actions, size=(cfg.n_agents,))
+        actions = {agent: int(np.random.randint(0, cfg.num_actions)) for agent in env.agents}
         env.step(actions)
         env.render()
     env.close()
