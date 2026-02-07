@@ -28,10 +28,10 @@ from env.swarm_env import SwarmEnv
 @dataclass
 class DQNConfig:
     """Hyperparameters for DQN training."""
-    gamma: float = 0.98
-    batch_size: int = 64
-    buffer_size: int = 50_000
-    lr: float = 3e-4
+    gamma: float = 0.98 # Discount factor for future rewards.
+    batch_size: int = 64 # Minibatch size for sampling from replay buffer.
+    buffer_size: int = 50_000 # Experience memory
+    lr: float = 3e-4 # Learning rate for Adam optimizer.
     target_update: int = 200
     epsilon_start: float = 1.0
     epsilon_final: float = 0.05
