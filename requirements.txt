@@ -3,3 +3,6 @@ pygame
 torch
 gymnasium
 pettingzoo
+stable-baselines3
+supersuit
+ray[rllib]

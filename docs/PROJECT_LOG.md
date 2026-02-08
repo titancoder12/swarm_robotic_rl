@@ -7,6 +7,7 @@ Use this file to capture decisions, open questions, and next steps so we can res
 - PettingZoo Parallel API for dict-based multi-agent interactions.
 - Discrete 9-action joystick interface.
 - DQN training with independent or shared policies.
+- Optional SB3/RLlib DQN training backends.
 - Demo and screenshot tooling included.
 
 ## Key Commands

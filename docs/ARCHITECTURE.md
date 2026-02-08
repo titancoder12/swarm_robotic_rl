@@ -24,6 +24,12 @@ Core idea: agents **do not communicate directly**. They interact only by sensing
   - Random policy runner for API validation
 - `train/independent_dqn_pytorch.py`
   - Minimal DQN training loop with optional shared policy
+- `train/sb3_dqn.py`
+  - DQN training using Stable-Baselines3 (shared policy)
+- `train/rllib_dqn.py`
+  - DQN training using RLlib (shared policy)
+- `train/train.py`
+  - Backend dispatcher for training (custom, SB3, RLlib)
 - `train/demo.py`
   - Loads saved checkpoints and renders policy behavior
 - `docs/ARCHITECTURE.md`
@@ -172,6 +178,10 @@ Episode ends when:
 - Separate replay buffer per agent
 - Independent Q-networks by default
 - Optional shared-policy mode (`--shared-policy`)
+
+Optional library backends:
+- SB3 DQN: `train/sb3_dqn.py` (shared policy with SuperSuit vectorization)
+- RLlib DQN: `train/rllib_dqn.py` (shared policy via RLlib multi-agent config)
 
 ### 11.1 Replay Buffer
 Stores tuples:

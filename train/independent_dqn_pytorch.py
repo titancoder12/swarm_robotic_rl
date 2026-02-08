@@ -240,7 +240,7 @@ def train(args):
     env.close()
 
 
-def parse_args():
+def parse_args(argv=None):
     """Parse CLI args for training configuration."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--total-steps", type=int, default=10000)
@@ -251,7 +251,7 @@ def parse_args():
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--save-dir", type=str, default="checkpoints")
     parser.add_argument("--save-every", type=int, default=0, help="Save every N steps (0 = only at end)")
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
 def _save_models(save_dir: str, q_nets: List[QNetwork], shared: bool):

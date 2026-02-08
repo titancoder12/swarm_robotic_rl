@@ -12,6 +12,8 @@
 - `python train/random_rollout.py`: rendered random policy sanity check.
 - `python train/independent_dqn_pytorch.py --headless --total-steps 10000`: headless training run.
 - `python train/independent_dqn_pytorch.py --headless --save-every 2000 --save-dir checkpoints`: save checkpoints during training.
+- `python train/train.py --backend sb3 --headless --total-steps 10000`: SB3 DQN training (shared policy).
+- `python train/train.py --backend rllib --headless --total-steps 10000`: RLlib DQN training (shared policy).
 - `python train/demo.py --checkpoint-dir checkpoints`: render a trained policy demo.
 - `python train/capture_screenshots.py`: regenerate screenshots in `docs/images/`.
 

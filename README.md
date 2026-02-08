@@ -75,6 +75,23 @@ Save checkpoints during training:
 python train/independent_dqn_pytorch.py --headless --save-every 2000 --save-dir checkpoints
 ```
 
+## Training Backends (Optional)
+
+Default (custom DQN):
+```bash
+python train/train.py --backend custom --headless --total-steps 10000
+```
+
+Stable-Baselines3 DQN (shared policy):
+```bash
+python train/train.py --backend sb3 --headless --total-steps 10000 --save-path checkpoints/sb3_dqn.zip
+```
+
+RLlib DQN (shared policy):
+```bash
+python train/train.py --backend rllib --headless --total-steps 10000 --save-dir checkpoints/rllib_dqn
+```
+
 ## Demo (rendered)
 
 ```bash
@@ -85,6 +102,18 @@ Shared-policy demo:
 
 ```bash
 python train/demo.py --checkpoint-dir checkpoints --shared-policy
+```
+
+SB3 demo:
+
+```bash
+python train/demo.py --backend sb3 --sb3-model checkpoints/sb3_dqn.zip
+```
+
+RLlib demo:
+
+```bash
+python train/demo.py --backend rllib --rllib-checkpoint checkpoints/rllib_dqn
 ```
 
 ## Environment API (PettingZoo Parallel API)
