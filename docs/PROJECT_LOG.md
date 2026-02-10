@@ -14,6 +14,10 @@ Use this file to capture decisions, open questions, and next steps so we can res
 ## Change Log
 - Added a repo rule: when Codex updates files, it must log a short summary in `docs/PROJECT_LOG.md` (added to `AGENTS.md`).
 - Summary of recent work: converted `SwarmEnv` to PettingZoo Parallel API, updated training/demo scripts to dict-based I/O, added SB3/RLlib backends with dispatcher, expanded dependencies in `requirements.txt`, updated docs, and added RLlib compatibility shims; checkpoints saved for RLlib in `checkpoints/rllib_dqn/`.
+- Fixed RLlib demo loading by normalizing the checkpoint path to a `file://` URI in `train/demo.py`.
+- Patched RLlib demo to coerce replay buffer type to a string during `Algorithm.from_checkpoint`.
+- Registered the `swarm_pz` env in RLlib demo before loading checkpoints.
+- Disabled strict RLlib DQN config validation during demo checkpoint load to avoid replay buffer type errors.
 
 ## Key Commands
 - Random rollout: `python train/random_rollout.py`

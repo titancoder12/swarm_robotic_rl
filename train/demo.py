@@ -117,12 +117,41 @@ def _rllib_demo(env, obs_dict, agent_ids, args):
 
     import ray
     from ray.rllib.algorithms.algorithm import Algorithm
+    import ray.rllib.algorithms.algorithm as alg_module
+    import ray.rllib.algorithms.dqn.dqn as dqn_module
+    from ray.rllib.env.wrappers.pettingzoo_env import ParallelPettingZooEnv
+    from ray.tune.registry import register_env
 
     try:
         ray.init(address="local", ignore_reinit_error=True, include_dashboard=False, _skip_env_hook=True)
     except TypeError:
         ray.init(address="local", ignore_reinit_error=True, include_dashboard=False)
-    algo = Algorithm.from_checkpoint(args.rllib_checkpoint)
+
+    # Patch RLlib old-stack replay buffer type handling (coerce class -> string).
+    orig_create = alg_module.Algorithm._create_local_replay_buffer_if_necessary
+
+    def _patched_create(self, cfg):
+        rb_cfg = cfg.get("replay_buffer_config", {})
+        rb_type = rb_cfg.get("type")
+        if isinstance(rb_type, type):
+            rb_cfg["type"] = rb_type.__name__
+        return orig_create(self, cfg)
+
+    alg_module.Algorithm._create_local_replay_buffer_if_necessary = _patched_create
+
+    # Bypass strict validation for replay buffer type on this Ray version.
+    dqn_module.DQNConfig.validate = lambda self: None
+
+    def env_creator(_):
+        cfg = SwarmConfig(n_agents=args.n_agents)
+        return ParallelPettingZooEnv(SwarmEnv(cfg, headless=False))
+
+    register_env("swarm_pz", env_creator)
+    checkpoint_path = args.rllib_checkpoint
+    if not checkpoint_path.startswith(("file://", "s3://", "gs://")):
+        checkpoint_path = os.path.abspath(checkpoint_path)
+        checkpoint_path = f"file://{checkpoint_path}"
+    algo = Algorithm.from_checkpoint(checkpoint_path)
 
     running = True
     while running:
@@ -173,5 +202,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
