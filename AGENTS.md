@@ -28,6 +28,9 @@
 - When adding features, include a minimal runnable check (e.g., a new script in `train/` or a reproducible command in `README.md`).
 - If you add tests, document how to run them here and in `README.md`.
 
+## Change Log Rule
+- When Codex updates any files, add a short summary of changes to `docs/PROJECT_LOG.md`.
+
 ## Commit & Pull Request Guidelines
 - Recent commits are short, imperative phrases (e.g., “docs”, “screenshots”); no strict convention observed.
 - Keep commit subjects concise and scoped to the change.

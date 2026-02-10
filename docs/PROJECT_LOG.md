@@ -11,6 +11,10 @@ Use this file to capture decisions, open questions, and next steps so we can res
 - Demo and screenshot tooling included.
  - RLlib backend uses compatibility shims and may require setting `RAY_TMPDIR` if `/tmp` is full.
 
+## Change Log
+- Added a repo rule: when Codex updates files, it must log a short summary in `docs/PROJECT_LOG.md` (added to `AGENTS.md`).
+- Summary of recent work: converted `SwarmEnv` to PettingZoo Parallel API, updated training/demo scripts to dict-based I/O, added SB3/RLlib backends with dispatcher, expanded dependencies in `requirements.txt`, updated docs, and added RLlib compatibility shims; checkpoints saved for RLlib in `checkpoints/rllib_dqn/`.
+
 ## Key Commands
 - Random rollout: `python train/random_rollout.py`
 - Train (headless): `python train/independent_dqn_pytorch.py --headless --total-steps 10000 --save-dir checkpoints --save-every 2000`
