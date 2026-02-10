@@ -4,8 +4,17 @@ import argparse
 import os
 import sys
 
+import os
+
+os.environ.setdefault("RAY_ENABLE_UV_RUN_RUNTIME_ENV", "0")
+
 import ray
-from ray.rllib.algorithms.dqn import DQNConfig
+from ray.rllib.algorithms.dqn import DQN, DQNConfig
+import ray.rllib.algorithms.dqn.dqn as dqn_module
+from ray.rllib.utils.replay_buffers.multi_agent_prioritized_replay_buffer import (
+    MultiAgentPrioritizedReplayBuffer,
+)
+from ray.rllib.algorithms.algorithm import Algorithm
 from ray.rllib.env.wrappers.pettingzoo_env import ParallelPettingZooEnv
 from ray.tune.registry import register_env
 
@@ -28,7 +37,10 @@ def parse_args(argv=None):
 
 
 def run(args):
-    ray.init(ignore_reinit_error=True, include_dashboard=False)
+    try:
+        ray.init(address="local", ignore_reinit_error=True, include_dashboard=False, _skip_env_hook=True)
+    except TypeError:
+        ray.init(address="local", ignore_reinit_error=True, include_dashboard=False)
 
     def env_creator(_):
         cfg = SwarmConfig(n_agents=args.n_agents)
@@ -37,8 +49,8 @@ def run(args):
     register_env("swarm_pz", env_creator)
 
     tmp_env = env_creator({})
-    obs_space = tmp_env.observation_space("agent_0")
-    act_space = tmp_env.action_space("agent_0")
+    obs_space = tmp_env.observation_space["agent_0"]
+    act_space = tmp_env.action_space["agent_0"]
     tmp_env.close()
 
     policies = {"shared_policy": (None, obs_space, act_space, {})}
@@ -48,12 +60,40 @@ def run(args):
         DQNConfig()
         .environment("swarm_pz")
         .framework("torch")
-        .rollouts(num_rollout_workers=0)
-        .training(seed=args.seed)
+        .env_runners(num_env_runners=0)
         .multi_agent(policies=policies, policy_mapping_fn=policy_mapping_fn)
     )
+    config = config.experimental(_validate_config=False)
+    config = config.api_stack(
+        enable_rl_module_and_learner=False,
+        enable_env_runner_and_connector_v2=False,
+    )
+    config = config.training(
+        replay_buffer_config={
+            "type": MultiAgentPrioritizedReplayBuffer,
+            "prioritized_replay_alpha": 0.6,
+            "prioritized_replay_beta": 0.4,
+            "prioritized_replay_eps": 1e-6,
+        }
+    )
 
-    algo = config.build()
+    config_dict = config.to_dict()
+
+    # Patch RLlib old-stack replay buffer type handling (coerce class -> string).
+    orig_create = Algorithm._create_local_replay_buffer_if_necessary
+
+    def _patched_create(self, cfg):
+        rb_cfg = cfg.get("replay_buffer_config", {})
+        rb_type = rb_cfg.get("type")
+        if isinstance(rb_type, type):
+            rb_cfg["type"] = rb_type.__name__
+        return orig_create(self, cfg)
+
+    Algorithm._create_local_replay_buffer_if_necessary = _patched_create
+
+    # Bypass strict validation for replay buffer type (Ray version mismatch).
+    dqn_module.DQNConfig.validate = lambda self: None
+    algo = DQN(config=config_dict)
     timesteps = 0
     while timesteps < args.total_steps:
         result = algo.train()

@@ -86,6 +86,7 @@ class SwarmEnv(ParallelEnv):
         """Create an environment instance with a given config."""
         self.cfg = cfg
         self.headless = headless
+        self.render_mode = None if headless else "human"
         self.rng = np.random.default_rng(cfg.seed)
 
         self.width = cfg.width

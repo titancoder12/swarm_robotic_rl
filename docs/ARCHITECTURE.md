@@ -181,7 +181,7 @@ Episode ends when:
 
 Optional library backends:
 - SB3 DQN: `train/sb3_dqn.py` (shared policy with SuperSuit vectorization)
-- RLlib DQN: `train/rllib_dqn.py` (shared policy via RLlib multi-agent config)
+- RLlib DQN: `train/rllib_dqn.py` (shared policy via RLlib multi-agent config, with compatibility shims for current Ray APIs)
 
 ### 11.1 Replay Buffer
 Stores tuples:

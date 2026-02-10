@@ -9,6 +9,7 @@ Use this file to capture decisions, open questions, and next steps so we can res
 - DQN training with independent or shared policies.
 - Optional SB3/RLlib DQN training backends.
 - Demo and screenshot tooling included.
+ - RLlib backend uses compatibility shims and may require setting `RAY_TMPDIR` if `/tmp` is full.
 
 ## Key Commands
 - Random rollout: `python train/random_rollout.py`

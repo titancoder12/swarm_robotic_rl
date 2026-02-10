@@ -4,7 +4,9 @@ import argparse
 import os
 import sys
 
+import numpy as np
 import supersuit as ss
+import torch
 from stable_baselines3 import DQN
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -32,7 +34,15 @@ def run(args):
     env = ss.pettingzoo_env_to_vec_env_v1(base_env)
     env = ss.concat_vec_envs_v1(env, num_vec_envs=1, num_cpus=0, base_class="stable_baselines3")
 
-    model = DQN("MlpPolicy", env, verbose=1, seed=args.seed, tensorboard_log=None)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+
+    try:
+        env.reset()
+    except TypeError:
+        pass
+
+    model = DQN("MlpPolicy", env, verbose=1, tensorboard_log=None)
     model.learn(total_timesteps=args.total_steps)
 
     os.makedirs(os.path.dirname(args.save_path), exist_ok=True)

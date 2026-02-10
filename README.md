@@ -92,6 +92,11 @@ RLlib DQN (shared policy):
 python train/train.py --backend rllib --headless --total-steps 10000 --save-dir checkpoints/rllib_dqn
 ```
 
+If Ray warns about `/tmp` being full, point it to a different temp dir:
+```bash
+RAY_TMPDIR="$(pwd)/.ray_tmp" python train/train.py --backend rllib --headless --total-steps 10000 --save-dir checkpoints/rllib_dqn
+```
+
 ## Demo (rendered)
 
 ```bash

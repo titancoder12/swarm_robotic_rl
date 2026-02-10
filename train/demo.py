@@ -111,10 +111,17 @@ def _sb3_demo(env, obs_dict, agent_ids, args):
 
 
 def _rllib_demo(env, obs_dict, agent_ids, args):
+    import os
+
+    os.environ.setdefault("RAY_ENABLE_UV_RUN_RUNTIME_ENV", "0")
+
     import ray
     from ray.rllib.algorithms.algorithm import Algorithm
 
-    ray.init(ignore_reinit_error=True, include_dashboard=False)
+    try:
+        ray.init(address="local", ignore_reinit_error=True, include_dashboard=False, _skip_env_hook=True)
+    except TypeError:
+        ray.init(address="local", ignore_reinit_error=True, include_dashboard=False)
     algo = Algorithm.from_checkpoint(args.rllib_checkpoint)
 
     running = True
