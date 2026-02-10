@@ -92,9 +92,9 @@ RLlib DQN (shared policy):
 python train/train.py --backend rllib --headless --total-steps 10000 --save-dir checkpoints/rllib_dqn
 ```
 
-If Ray warns about `/tmp` being full, point it to a different temp dir:
+If Ray warns about `/tmp` being full or socket path length, point it to a different temp dir:
 ```bash
-RAY_TMPDIR="$(pwd)/.ray_tmp" python train/train.py --backend rllib --headless --total-steps 10000 --save-dir checkpoints/rllib_dqn
+python train/train.py --backend rllib --headless --total-steps 10000 --save-dir checkpoints/rllib_dqn --ray-tmpdir /Users/christopherlin/.ray_tmp
 ```
 
 ## Demo (rendered)
@@ -119,6 +119,16 @@ RLlib demo:
 
 ```bash
 python train/demo.py --backend rllib --rllib-checkpoint checkpoints/rllib_dqn
+```
+
+With a custom Ray temp dir:
+```bash
+python train/demo.py --backend rllib --rllib-checkpoint checkpoints/rllib_dqn --ray-tmpdir /Users/christopherlin/.ray_tmp
+```
+
+To auto-exit after N steps (useful for smoke tests):
+```bash
+python train/demo.py --backend custom --max-steps 200
 ```
 
 ## Environment API (PettingZoo Parallel API)

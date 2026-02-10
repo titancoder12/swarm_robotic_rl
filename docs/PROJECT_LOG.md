@@ -18,6 +18,9 @@ Use this file to capture decisions, open questions, and next steps so we can res
 - Patched RLlib demo to coerce replay buffer type to a string during `Algorithm.from_checkpoint`.
 - Registered the `swarm_pz` env in RLlib demo before loading checkpoints.
 - Disabled strict RLlib DQN config validation during demo checkpoint load to avoid replay buffer type errors.
+- Added `--max-steps` to `train/demo.py` so demos can auto-exit for smoke tests.
+- Added `--ray-tmpdir` flag to RLlib training and demo to avoid `/tmp` pressure and socket path length issues.
+- Added `.ray_tmp/` to `.gitignore`.
 
 ## Key Commands
 - Random rollout: `python train/random_rollout.py`

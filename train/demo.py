@@ -24,9 +24,16 @@ def parse_args(argv=None):
     parser.add_argument("--checkpoint-dir", type=str, default="checkpoints")
     parser.add_argument("--sb3-model", type=str, default="checkpoints/sb3_dqn.zip")
     parser.add_argument("--rllib-checkpoint", type=str, default="checkpoints/rllib_dqn")
+    parser.add_argument(
+        "--ray-tmpdir",
+        type=str,
+        default="",
+        help="Override Ray temp dir (useful to avoid /tmp space or socket path length issues).",
+    )
     parser.add_argument("--shared-policy", action="store_true")
     parser.add_argument("--n-agents", type=int, default=6)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--max-steps", type=int, default=0, help="Exit after N steps (0 = run until window closed)")
     return parser.parse_args(argv)
 
 
@@ -57,6 +64,7 @@ def _custom_demo(env, obs, agent_ids, args):
     nets = load_models(args.checkpoint_dir, obs_dim, action_dim, env.cfg.n_agents, args.shared_policy, device)
 
     running = True
+    steps = 0
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -76,6 +84,9 @@ def _custom_demo(env, obs, agent_ids, args):
         truncated = any(truncations.values())
 
         env.render(fps=60)
+        steps += 1
+        if args.max_steps and steps >= args.max_steps:
+            running = False
         if terminated or truncated:
             obs_dict, _ = env.reset(seed=args.seed)
             obs = np.stack([obs_dict[agent] for agent in agent_ids], axis=0)
@@ -89,6 +100,7 @@ def _sb3_demo(env, obs_dict, agent_ids, args):
     model = DQN.load(args.sb3_model, device="cpu")
 
     running = True
+    steps = 0
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -104,6 +116,9 @@ def _sb3_demo(env, obs_dict, agent_ids, args):
         truncated = any(truncations.values())
 
         env.render(fps=60)
+        steps += 1
+        if args.max_steps and steps >= args.max_steps:
+            running = False
         if terminated or truncated:
             obs_dict, _ = env.reset(seed=args.seed)
 
@@ -114,6 +129,8 @@ def _rllib_demo(env, obs_dict, agent_ids, args):
     import os
 
     os.environ.setdefault("RAY_ENABLE_UV_RUN_RUNTIME_ENV", "0")
+    if args.ray_tmpdir:
+        os.environ["RAY_TMPDIR"] = args.ray_tmpdir
 
     import ray
     from ray.rllib.algorithms.algorithm import Algorithm
@@ -154,6 +171,7 @@ def _rllib_demo(env, obs_dict, agent_ids, args):
     algo = Algorithm.from_checkpoint(checkpoint_path)
 
     running = True
+    steps = 0
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -169,6 +187,9 @@ def _rllib_demo(env, obs_dict, agent_ids, args):
         truncated = any(truncations.values())
 
         env.render(fps=60)
+        steps += 1
+        if args.max_steps and steps >= args.max_steps:
+            running = False
         if terminated or truncated:
             obs_dict, _ = env.reset(seed=args.seed)
 

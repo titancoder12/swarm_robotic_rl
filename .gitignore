@@ -21,6 +21,7 @@ dist/
 .mypy_cache/
 .ruff_cache/
 .ipynb_checkpoints/
+.ray_tmp/
 
 # Checkpoints / outputs
 checkpoints/

@@ -14,7 +14,7 @@
 - `python train/independent_dqn_pytorch.py --headless --save-every 2000 --save-dir checkpoints`: save checkpoints during training.
 - `python train/train.py --backend sb3 --headless --total-steps 10000`: SB3 DQN training (shared policy).
 - `python train/train.py --backend rllib --headless --total-steps 10000`: RLlib DQN training (shared policy).
-- If Ray warns about `/tmp` space, run RLlib with `RAY_TMPDIR="$(pwd)/.ray_tmp"` set.
+- If Ray warns about `/tmp` space, pass `--ray-tmpdir` to the RLlib commands.
 - `python train/demo.py --checkpoint-dir checkpoints`: render a trained policy demo.
 - `python train/capture_screenshots.py`: regenerate screenshots in `docs/images/`.
 

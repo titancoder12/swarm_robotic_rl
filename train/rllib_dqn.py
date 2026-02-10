@@ -33,10 +33,18 @@ def parse_args(argv=None):
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--headless", action="store_true")
     parser.add_argument("--save-dir", type=str, default="checkpoints/rllib_dqn")
+    parser.add_argument(
+        "--ray-tmpdir",
+        type=str,
+        default="",
+        help="Override Ray temp dir (useful to avoid /tmp space or socket path length issues).",
+    )
     return parser.parse_args(argv)
 
 
 def run(args):
+    if args.ray_tmpdir:
+        os.environ["RAY_TMPDIR"] = args.ray_tmpdir
     try:
         ray.init(address="local", ignore_reinit_error=True, include_dashboard=False, _skip_env_hook=True)
     except TypeError:
