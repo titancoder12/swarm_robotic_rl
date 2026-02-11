@@ -61,6 +61,19 @@ Key steps:
 - **Independent**: one Q-network per agent
 - **Shared**: one Q-network shared by all agents
 
+### How It Maps to RL Theory
+- **Policy (behavior):** epsilon-greedy over Q-values
+- **Value function:** Q-network approximates `Q(s, a)`
+- **Bellman update:** target is `r + gamma * max_a' Q_target(s', a')`
+- **Experience replay:** random sampling from the replay buffer
+
+### Key Code Blocks to Know
+- `DQNConfig`: hyperparameters (gamma, batch size, target update cadence, etc.)
+- `linear_schedule`: epsilon annealing
+- `ReplayBuffer`: FIFO storage for transitions
+- `QNetwork`: MLP from obs to Q-values
+- `train(...)`: main loop (collect → learn → target sync → save)
+
 
 ## 3) Demos (`train/demo.py`)
 
@@ -126,4 +139,3 @@ RLlib demo:
 ```
 python train/demo.py --backend rllib --rllib-checkpoint checkpoints/rllib_dqn --ray-tmpdir /Users/christopherlin/.ray_tmp
 ```
-
