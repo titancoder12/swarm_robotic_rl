@@ -23,6 +23,7 @@ Use this file to capture decisions, open questions, and next steps so we can res
 - Added `.ray_tmp/` to `.gitignore`.
 - Added `docs/ONBOARDING.md` with a code-first RL walkthrough for future developers.
 - Expanded `docs/ONBOARDING.md` with the DQN trainer mapping (theory → code and key blocks).
+- Added `docs/QandA.md` to capture common questions and answers.
 
 ## Key Commands
 - Random rollout: `python train/random_rollout.py`
