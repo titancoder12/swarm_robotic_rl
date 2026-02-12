@@ -25,6 +25,7 @@ Use this file to capture decisions, open questions, and next steps so we can res
 - Expanded `docs/ONBOARDING.md` with the DQN trainer mapping (theory → code and key blocks).
 - Added `docs/QandA.md` to capture common questions and answers.
 - Added an `AGENTS.md` rule to log system/codebase questions into `docs/QandA.md`.
+- Added an Environment MDP diagram to `docs/UML.md`.
 
 ## Key Commands
 - Random rollout: `python train/random_rollout.py`

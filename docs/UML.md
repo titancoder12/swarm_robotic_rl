@@ -96,6 +96,27 @@ flowchart LR
   F --> G["Rewards + Done flags"]
 ```
 
+## Environment MDP (SwarmEnv)
+
+```mermaid
+flowchart TD
+  Reset["SwarmEnv.reset()"] --> InitWorld["Spawn obstacles/targets/agents"]
+  InitWorld --> Obs0["obs_dict (per agent)"]
+
+  Obs0 --> Policy["Policy π(a|s)"]
+  Policy --> Actions["action_dict (per agent)"]
+  Actions --> Step["SwarmEnv.step(action_dict)"]
+  Step --> Dynamics["DynamicsDriver.apply()"]
+  Step --> Collisions["_handle_collisions()"]
+  Step --> Targets["_handle_targets()"]
+  Step --> Pheromone["_update_pheromone()"]
+  Step --> Obs1["_get_obs()"]
+  Step --> Rewards["rewards_dict"]
+  Step --> Done["terminations / truncations"]
+
+  Obs1 --> Policy
+```
+
 ## Training Flow (Independent DQN)
 
 ```mermaid
