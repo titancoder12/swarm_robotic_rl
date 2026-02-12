@@ -20,3 +20,4 @@ A: It is the **environment** that defines the MDP: observations, actions, reward
 ## Q: In sim-to-real transfer, is `_get_obs()` the key interface?
 A: Largely yes: `_get_obs()` maps world state to the observation vector the policy uses. On a robot, the equivalent is the **sensor preprocessing pipeline** that produces the same vector. You also need an **action interface** that maps actions to motor commands.
 
+

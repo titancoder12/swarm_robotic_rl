@@ -30,6 +30,7 @@
 
 ## Change Log Rule
 - When Codex updates any files, add a short summary of changes to `docs/PROJECT_LOG.md`.
+- When the user asks a question about the system or codebase, append a concise Q&A entry to `docs/QandA.md`.
 
 ## Commit & Pull Request Guidelines
 - Recent commits are short, imperative phrases (e.g., “docs”, “screenshots”); no strict convention observed.
