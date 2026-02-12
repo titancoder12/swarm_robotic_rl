@@ -1,4 +1,4 @@
-# Q&A Log
+# Q&A
 
 This file captures recurring questions and answers discussed during development so future contributors can reference decisions quickly.
 
