@@ -31,3 +31,6 @@ A: See `docs/ToDo.md` for a required-change checklist covering sensors/observati
 
 ## Q: What does it mean that the env is PettingZoo-native?
 A: It means `SwarmEnv` implements the **PettingZoo Parallel API** directly (dict-based `reset()` and `step()` with per-agent observations/rewards/terminations). You can plug it into PettingZoo-compatible tooling without extra wrappers.
+
+## Q: What does MLP stand for?
+A: **Multi-Layer Perceptron** — a standard feedforward neural network with fully connected layers.

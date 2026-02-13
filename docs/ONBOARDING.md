@@ -74,6 +74,17 @@ Key steps:
 - `QNetwork`: MLP from obs to Q-values
 - `train(...)`: main loop (collect → learn → target sync → save)
 
+### Plain-English Walkthrough
+At each step:
+- The agent observes its state (obs vector).
+- It chooses an action (random with prob epsilon, otherwise the highest-Q action).
+- The env returns the next obs and reward.
+- The transition is stored in replay.
+- Once warmup is done, a random minibatch is sampled.
+- The network is updated to match the **Bellman target**:
+  `target = r + gamma * max_a' Q_target(s', a')`
+- A separate target network is synced periodically for stability.
+
 
 ## 3) Demos (`train/demo.py`)
 

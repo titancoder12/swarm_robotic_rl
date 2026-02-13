@@ -190,6 +190,7 @@ def train(args):
             buffers[i].add(obs[i], actions[i], rewards[i], next_obs[i], done_flag)
             episode_rewards[i] += rewards[i]
 
+        # Move to next observation for the next step.
         obs = next_obs
         global_step += 1
 
@@ -198,6 +199,7 @@ def train(args):
             for i in range(cfg.n_agents):
                 if buffers[i].size < dqn_cfg.batch_size:
                     continue
+                # Off-policy learning: sample random past transitions.
                 batch = buffers[i].sample(dqn_cfg.batch_size)
                 batch = [b.to(device) for b in batch]
                 b_obs, b_actions, b_rewards, b_next_obs, b_dones = batch
@@ -205,7 +207,7 @@ def train(args):
                 # Current Q-values for chosen actions.
                 q_vals = q_nets[i](b_obs).gather(1, b_actions.unsqueeze(1)).squeeze(1)
                 with torch.no_grad():
-                    # Target uses max Q from target network.
+                    # Bellman target uses max Q from target network.
                     max_next = target_nets[i](b_next_obs).max(dim=1)[0]
                     target = b_rewards + dqn_cfg.gamma * (1.0 - b_dones) * max_next
 
