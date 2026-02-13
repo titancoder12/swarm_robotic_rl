@@ -37,6 +37,7 @@ Use this file to capture decisions, open questions, and next steps so we can res
 - Logged Q&A explaining that a Q-function is not itself a policy.
 - Logged Q&A clarifying that `batch_size`/`lr` are optimizer settings while `epsilon_*` is exploration.
 - Expanded `docs/ToDo.md` with sim-to-real training checks and logged the related Q&A.
+- Added line-by-line annotations to `train/independent_dqn_pytorch.py` and noted this in `docs/ONBOARDING.md`.
 
 ## Key Commands
 - Random rollout: `python train/random_rollout.py`

@@ -85,6 +85,9 @@ At each step:
   `target = r + gamma * max_a' Q_target(s', a')`
 - A separate target network is synced periodically for stability.
 
+### File Notes
+The file is now annotated line-by-line with inline comments to clarify each step in the DQN pipeline.
+
 
 ## 3) Demos (`train/demo.py`)
 
