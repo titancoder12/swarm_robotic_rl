@@ -23,3 +23,8 @@ A: Largely yes: `_get_obs()` maps world state to the observation vector the poli
 ## Q: Does `_handle_targets` reward agents based on distance, and how would this work in the real world?
 A: In the sim, `_handle_targets()` gives a reward **only when a target is collected** (within the target radius). It does **not** reward based on distance. In the real world, you’d need a **detectable target** (e.g., marker/vision/RFID) so the robot can confirm contact, or you’d change the task so rewards come from its own sensors (e.g., signal strength/proximity). The observation pipeline must be built from real sensors, and “target collected” must be detectable by the robot.
 
+## Q: If reward depends on a target radius, does the environment need to know target locations?
+A: In simulation, yes—the environment tracks target positions to determine if an agent is within the collection radius. That’s not necessarily distance-shaped reward; it’s a **binary “collected” check**. In the real world, the equivalent is a **target detection signal** from sensors, not a hidden oracle.
+
+## Q: What needs to change for real-world deployment?
+A: See `docs/ToDo.md` for a required-change checklist covering sensors/observations, action interface, target detection, reset procedures, safety, domain gap mitigation, runtime loop, and logging.
