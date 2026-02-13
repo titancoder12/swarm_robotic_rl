@@ -32,12 +32,19 @@ This list captures the minimum changes needed to move from simulation to a physi
 ## 6) Domain Gap Mitigation
 - Add noise/randomization in sim (sensor noise, dynamics variations).
 - Calibrate dynamics and observation scales to match the real robot.
+- Use randomized target positions, lighting, and textures if vision is involved.
+- Consider curriculum training (simple → complex) to improve robustness.
 
 ## 7) Deployment Runtime
-- Create a real‑time loop that runs policy inference at a fixed frequency.
+- Create a real-time loop that runs policy inference at a fixed frequency.
 - Ensure deterministic inference timing and logging.
 
 ## 8) Data Logging & Evaluation
 - Log sensor streams, actions, and events for debugging.
 - Define success metrics and test protocols.
 
+## 9) Sim-to-Real Training Checks
+- Verify observations are **normalized the same way** in sim and real.
+- Ensure action scaling/limits match the real robot.
+- Evaluate the policy in sim with **noise and delays** similar to real sensors.
+- Add safety constraints during training (e.g., penalty for unsafe proximity).

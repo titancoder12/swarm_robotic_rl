@@ -46,3 +46,6 @@ A: Not exactly. A **Q-function** estimates how good an action is in a state. A *
 
 ## Q: Are `batch_size`, `lr`, and `epsilon_*` for stochastic batch gradient descent?
 A: **Partly.** `batch_size` and `lr` control the **stochastic gradient descent** updates (how many samples per update, how big each step is). `epsilon_*` is **not** about gradient descent; it controls **exploration** in the policy (random action rate), not the optimizer.
+
+## Q: For sim-to-real transfer, what should we pay attention to during training?
+A: Focus on **domain gap**: match observation normalization and action scaling, add sensor/dynamics noise, include delays, and train with randomized environments. Consider safety penalties and curriculum training. These items were added to `docs/ToDo.md`.
