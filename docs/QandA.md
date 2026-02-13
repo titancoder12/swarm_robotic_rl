@@ -20,4 +20,6 @@ A: It is the **environment** that defines the MDP: observations, actions, reward
 ## Q: In sim-to-real transfer, is `_get_obs()` the key interface?
 A: Largely yes: `_get_obs()` maps world state to the observation vector the policy uses. On a robot, the equivalent is the **sensor preprocessing pipeline** that produces the same vector. You also need an **action interface** that maps actions to motor commands.
 
+## Q: Does `_handle_targets` reward agents based on distance, and how would this work in the real world?
+A: In the sim, `_handle_targets()` gives a reward **only when a target is collected** (within the target radius). It does **not** reward based on distance. In the real world, you’d need a **detectable target** (e.g., marker/vision/RFID) so the robot can confirm contact, or you’d change the task so rewards come from its own sensors (e.g., signal strength/proximity). The observation pipeline must be built from real sensors, and “target collected” must be detectable by the robot.
 
