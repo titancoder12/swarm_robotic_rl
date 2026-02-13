@@ -40,3 +40,9 @@ A: They **do the training**, but they are built on top of a deep learning framew
 
 ## Q: What’s the relationship between PettingZoo, SB3/RLlib, and PyTorch?
 A: PettingZoo is the **environment API** (multi-agent interface). SB3/RLlib are **RL training libraries** that implement algorithms and use environments. PyTorch is the **deep learning backend** used by those libraries to build and train neural networks. In short: PettingZoo (env) → SB3/RLlib (RL algorithm) → PyTorch (NNs/gradients).
+
+## Q: Is a Q-function a policy?
+A: Not exactly. A **Q-function** estimates how good an action is in a state. A **policy** chooses actions. In DQN, the policy is derived from the Q-function by taking `argmax_a Q(s, a)` (often with epsilon-greedy exploration).
+
+## Q: Are `batch_size`, `lr`, and `epsilon_*` for stochastic batch gradient descent?
+A: **Partly.** `batch_size` and `lr` control the **stochastic gradient descent** updates (how many samples per update, how big each step is). `epsilon_*` is **not** about gradient descent; it controls **exploration** in the policy (random action rate), not the optimizer.

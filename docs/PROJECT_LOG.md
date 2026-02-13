@@ -34,6 +34,8 @@ Use this file to capture decisions, open questions, and next steps so we can res
 - Added inline comments to `train/independent_dqn_pytorch.py` and expanded the DQN walkthrough in `docs/ONBOARDING.md`.
 - Logged Q&A about SB3/RLlib training vs underlying DL libraries.
 - Logged Q&A about PettingZoo vs SB3/RLlib vs PyTorch roles.
+- Logged Q&A explaining that a Q-function is not itself a policy.
+- Logged Q&A clarifying that `batch_size`/`lr` are optimizer settings while `epsilon_*` is exploration.
 
 ## Key Commands
 - Random rollout: `python train/random_rollout.py`
