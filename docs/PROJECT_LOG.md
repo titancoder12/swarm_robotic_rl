@@ -32,6 +32,8 @@ Use this file to capture decisions, open questions, and next steps so we can res
 - Logged Q&A about what it means for the env to be PettingZoo-native.
 - Logged Q&A defining MLP (Multi-Layer Perceptron).
 - Added inline comments to `train/independent_dqn_pytorch.py` and expanded the DQN walkthrough in `docs/ONBOARDING.md`.
+- Logged Q&A about SB3/RLlib training vs underlying DL libraries.
+- Logged Q&A about PettingZoo vs SB3/RLlib vs PyTorch roles.
 
 ## Key Commands
 - Random rollout: `python train/random_rollout.py`

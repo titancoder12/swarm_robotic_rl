@@ -34,3 +34,9 @@ A: It means `SwarmEnv` implements the **PettingZoo Parallel API** directly (dict
 
 ## Q: What does MLP stand for?
 A: **Multi-Layer Perceptron** — a standard feedforward neural network with fully connected layers.
+
+## Q: Do SB3/RLlib do the training themselves or use an underlying DL library?
+A: They **do the training**, but they are built on top of a deep learning framework. SB3 uses **PyTorch**. RLlib supports **PyTorch** (and sometimes other backends). The library manages the RL algorithm loop; the DL framework handles neural nets and gradients.
+
+## Q: What’s the relationship between PettingZoo, SB3/RLlib, and PyTorch?
+A: PettingZoo is the **environment API** (multi-agent interface). SB3/RLlib are **RL training libraries** that implement algorithms and use environments. PyTorch is the **deep learning backend** used by those libraries to build and train neural networks. In short: PettingZoo (env) → SB3/RLlib (RL algorithm) → PyTorch (NNs/gradients).
