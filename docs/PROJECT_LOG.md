@@ -29,6 +29,7 @@ Use this file to capture decisions, open questions, and next steps so we can res
 - Logged a Q&A about `_handle_targets` rewards and sim-to-real implications.
 - Logged a Q&A clarifying that target radius checks imply environment target knowledge in sim.
 - Added `docs/ToDo.md` with a sim-to-real required-change checklist.
+- Logged Q&A about what it means for the env to be PettingZoo-native.
 
 ## Key Commands
 - Random rollout: `python train/random_rollout.py`

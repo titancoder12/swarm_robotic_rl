@@ -28,3 +28,6 @@ A: In simulation, yes—the environment tracks target positions to determine if 
 
 ## Q: What needs to change for real-world deployment?
 A: See `docs/ToDo.md` for a required-change checklist covering sensors/observations, action interface, target detection, reset procedures, safety, domain gap mitigation, runtime loop, and logging.
+
+## Q: What does it mean that the env is PettingZoo-native?
+A: It means `SwarmEnv` implements the **PettingZoo Parallel API** directly (dict-based `reset()` and `step()` with per-agent observations/rewards/terminations). You can plug it into PettingZoo-compatible tooling without extra wrappers.
